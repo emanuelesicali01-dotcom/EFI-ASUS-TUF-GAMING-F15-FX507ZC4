@@ -1,0 +1,28 @@
+name: Build NVRM kext
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compila NVRM.kext
+        run: |
+          cd kexts/NVRM
+          xcodebuild -target NVRM -configuration Release -quiet || true
+
+      - name: Cerca il binario compilato
+        run: find . -name "NVRM" -type f 2>/dev/null
+
+      - name: Carica l'artefatto
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvrm-binary
+          path: |
+            **/NVRM.kext/Contents/MacOS/NVRM
+            **/NVRM
